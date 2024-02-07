@@ -1,0 +1,21 @@
+<% layout('/layouts/boilerplate') %>
+
+    <form action="/new" method="post">
+        <div>
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" required>
+            <label for="tag">Tag</label>
+            <input type="text" name="tag" id="tag">
+        </div>
+
+        <div>
+            <label for="note">Note</label>
+            <br>
+            <textarea name="note" id="note" cols="30" rows="10" required></textarea>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+   
+    <a href="/"><button>Cancel</button></a>
+
+    <%- include ('./partials/list') %>

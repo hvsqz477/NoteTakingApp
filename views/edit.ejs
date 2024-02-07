@@ -1,0 +1,25 @@
+<% layout('/layouts/boilerplate') %>
+
+<form  action="/<%=resultId.id%>/?_method=PATCH" method="POST">
+    
+    <div>
+        <label for="title">Title</label>
+        <input type="text" name="title" id="title" value="<%= resultId.title %>" required>
+        <label for="tag">Tag</label>
+        <input type="text" name="tag" id="tag" value="<%= resultId.tag %>">
+    </div>
+    
+    <div>
+        <label for="note"></label>
+        <br>
+        <textarea name="note" id="note" cols="30" rows="10" required><%= resultId.note %></textarea>
+    </div>
+    
+    <button type="submit">Save</button>
+
+</form>
+
+<a href="/">
+    <button>Close</button>
+</a>
+<%- include ('./partials/list') %>

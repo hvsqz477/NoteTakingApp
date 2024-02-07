@@ -1,0 +1,8 @@
+<% layout('/layouts/boilerplate') %>
+<ul>
+    <% notes.forEach(row => { %>
+        <li><a href="/<%= row.id %>"><%= row.title %> </a> - <b><%=row.tag%></b></li>
+        
+      <% }); %>
+    
+</ul>

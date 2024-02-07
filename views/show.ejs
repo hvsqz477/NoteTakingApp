@@ -1,0 +1,18 @@
+<% layout('/layouts/boilerplate') %>
+<h3><%= resultId.title %></h3>
+<a href="/?tag=<%= resultId.tag %>">#<%= resultId.tag %></a>
+<p> <%= resultId.note %> </p>
+<a href="/new">
+    <button>New Note</button>
+</a>
+
+<a href="/">
+    <button>Close</button>
+</a>
+<a href="/<%= resultId.id %>/edit">
+    <button>Edit</button>
+</a>
+<form action="/<%= resultId.id %>?_method=DELETE" method="post">
+    <button>Delete</button>
+</form>
+<%- include ('./partials/list') %>
