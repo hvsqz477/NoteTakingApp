@@ -46,10 +46,10 @@ app.use(methodOverride('_method'))
 
 
 app.get('/', async (req, res) => {
-    const {tagToFilter} = req.query;
-    console.log([tagToFilter]);
+    const {tag} = req.query;
+    console.log(tag);
     
-    // console.log(tagToFilter.tag);
+ 
     
     
   
@@ -58,10 +58,10 @@ app.get('/', async (req, res) => {
   
       let result;
   
-      if (tagToFilter) {
+      if (tag) {
         
         // If tag is specified, filter records by tag
-        result = await client.query('SELECT * FROM notes WHERE tag = $1', [tagToFilter]);
+        result = await client.query('SELECT * FROM notes WHERE tag = $1', [tag]);
       } else {
         // If no tag is specified, list all note titles and tags
         result = await client.query('SELECT * FROM notes');
@@ -69,7 +69,7 @@ app.get('/', async (req, res) => {
   
       client.release();
   
-      res.render('home', { notes: result.rows, tagToFilter  });
+      res.render('home', { notes: result.rows });
     // let notesInString = JSON.stringify(notes)
     
     } catch (err) {
@@ -109,12 +109,13 @@ res.status(500).send('Internal Server Error')
 
 app.get('/:id', async (req, res) => {
     
-    const noteId = req.params.id
+    const id =  parseInt(req.params.id)
+    console.log(id)
     try {
     const client = await pool.connect();
     const result = await client.query('SELECT * FROM notes');
     const notes = result.rows;
-    const resultId = await client.query('SELECT * FROM notes WHERE id = $1', [noteId]);
+    const resultId = await client.query('SELECT * FROM notes WHERE id = $1', [id]);
     const note = resultId.rows[0];
     client.release();
     res.render('show', {resultId: note, notes: notes});
