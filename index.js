@@ -49,9 +49,6 @@ app.get('/', async (req, res) => {
     const {tag} = req.query;
     console.log(tag);
     
- 
-    
-    
   
     try {
       const client = await pool.connect();
@@ -61,10 +58,10 @@ app.get('/', async (req, res) => {
       if (tag) {
         
         // If tag is specified, filter records by tag
-        result = await client.query('SELECT * FROM notes WHERE tag = $1', [tag]);
+        result = await client.query('SELECT * FROM notes WHERE tag = $1 AND archived = false', [tag]);
       } else {
         // If no tag is specified, list all note titles and tags
-        result = await client.query('SELECT * FROM notes');
+        result = await client.query('SELECT * FROM notes WHERE archived = false');
       }
   
       client.release();
@@ -83,7 +80,7 @@ app.get('/', async (req, res) => {
 app.get('/new',  async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT * FROM notes');
+        const result = await client.query('SELECT * FROM notes WHERE archived = false');
         const notes = result.rows;
         client.release();
     res.render('new', {notes: notes})
@@ -109,13 +106,13 @@ res.status(500).send('Internal Server Error')
 
 app.get('/:id', async (req, res) => {
     
-    const id =  parseInt(req.params.id)
+    const id = req.params.id
     console.log(id)
     try {
     const client = await pool.connect();
-    const result = await client.query('SELECT * FROM notes');
+    const result = await client.query('SELECT * FROM notes WHERE archived = false');
     const notes = result.rows;
-    const resultId = await client.query('SELECT * FROM notes WHERE id = $1', [id]);
+    const resultId = await client.query('SELECT * FROM notes WHERE id = $1 AND archived = false', [id]);
     const note = resultId.rows[0];
     client.release();
     res.render('show', {resultId: note, notes: notes});
