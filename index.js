@@ -44,29 +44,33 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({extended: true}))
 app.use(methodOverride('_method'))
 
+app.get('/favicon.ico', (req, res) => res.status(204));
+
 
 app.get('/', async (req, res) => {
     const {tag} = req.query;
-    console.log(tag);
+    
     
   
     try {
       const client = await pool.connect();
   
-      let result;
+     
   
       if (tag) {
         
         // If tag is specified, filter records by tag
-        result = await client.query('SELECT * FROM notes WHERE tag = $1 AND archived = false', [tag]);
+        const result = await client.query('SELECT * FROM notes WHERE tag = $1 AND isArchived = false', [tag]);
+        res.render('home', { notes: result.rows });
       } else {
         // If no tag is specified, list all note titles and tags
-        result = await client.query('SELECT * FROM notes WHERE archived = false');
+        const result = await client.query('SELECT * FROM notes WHERE isArchived = false');
+        res.render('home', { notes: result.rows });
       }
   
       client.release();
   
-      res.render('home', { notes: result.rows });
+   
     // let notesInString = JSON.stringify(notes)
     
     } catch (err) {
@@ -77,10 +81,29 @@ app.get('/', async (req, res) => {
     
 });
 
+app.get('/archived', async (req,res) => {
+    const {id} = req.params
+    console.log(id);
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM notes WHERE isArchived = true');
+        const archivednotes = result.rows;
+        console.log(archivednotes)
+        const resultId = await client.query('SELECT * FROM notes WHERE id = $1 AND isArchived = true', [id]);
+        const note = resultId.rows[0]
+        client.release
+        res.render('archived', { notes: archivednotes, resultId: note})
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error')  
+    }
+    
+})
+
 app.get('/new',  async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT * FROM notes WHERE archived = false');
+        const result = await client.query('SELECT * FROM notes WHERE isArchived  = false');
         const notes = result.rows;
         client.release();
     res.render('new', {notes: notes})
@@ -110,9 +133,9 @@ app.get('/:id', async (req, res) => {
     console.log(id)
     try {
     const client = await pool.connect();
-    const result = await client.query('SELECT * FROM notes WHERE archived = false');
+    const result = await client.query('SELECT * FROM notes WHERE isArchived = false');
     const notes = result.rows;
-    const resultId = await client.query('SELECT * FROM notes WHERE id = $1 AND archived = false', [id]);
+    const resultId = await client.query('SELECT * FROM notes WHERE id = $1', [id]);
     const note = resultId.rows[0];
     client.release();
     res.render('show', {resultId: note, notes: notes});
@@ -138,6 +161,8 @@ app.get('/:id/edit', async (req, res) => {
 res.status(500).send('Internal Server Error')
 }
 });
+
+
 
 app.patch('/:id', async (req, res) => {
     const noteId = req.params.id
