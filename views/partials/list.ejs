@@ -1,7 +1,19 @@
 <% layout('/layouts/boilerplate') %>
 <ul>
     <% notes.forEach(row => { %>
-        <li><a href="/<%= row.id %>"><%= row.title %> </a> - <b><%=row.tag%></b></li>
+      <% if (row.isarchived === false) {%>
+        <li><a href="/<%= row.id %>"><%= row.title %> </a> - <b><%=row.tag%></b></li> 
+        
+      <% } else { %>
+        <% if (row.title !== null) {%>
+          <li><a href="/archived/<%= row.id %>"><%= row.title %> </a> - <b><%=row.tag%></b></li>
+       <%   } else {%>
+          <p>No notes archived</p>
+          <a href="/"><button>Close</button></a>
+        <% }  %>
+        
+     <% } %>  
+        
         
       <% }); %>
     

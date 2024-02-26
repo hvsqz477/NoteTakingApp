@@ -9,10 +9,27 @@
 <a href="/">
     <button>Close</button>
 </a>
-<a href="/<%= resultId.id %>/edit">
-    <button>Edit</button>
+<% if (resultId.isarchived === false) { %>
+    <a href="/<%= resultId.id %>/edit">
+        <button>Edit</button>
+<% } else { %>
+   
+<% }  %>
+
+    
 </a>
 <form action="/<%= resultId.id %>?_method=DELETE" method="post">
     <button>Delete</button>
 </form>
+
+    <% if (resultId.isarchived !== true) { %>
+    <form action="archived/<%= resultId.id %>?_method=PATCH" method="post">
+        <button>Archive</button>
+    </form>
+    <% } else if (resultId.isarchived !== false) { %>
+    <form action="?_method=PATCH" method="post">
+        <button>Unarchive</button>
+    </form>
+    <% } %>
+
 <%- include ('./partials/list') %>

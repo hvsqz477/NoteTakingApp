@@ -82,6 +82,23 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/archived', async (req,res) => {
+    
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM notes WHERE isArchived = true');
+        const archivednotes = result.rows;
+        console.log(archivednotes)
+        
+        client.release
+        res.render('archived', { notes: archivednotes })
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error')  
+    }
+    
+})
+
+app.get('/archived/:id', async (req,res) => {
     const {id} = req.params
     console.log(id);
     try {
@@ -92,12 +109,39 @@ app.get('/archived', async (req,res) => {
         const resultId = await client.query('SELECT * FROM notes WHERE id = $1 AND isArchived = true', [id]);
         const note = resultId.rows[0]
         client.release
-        res.render('archived', { notes: archivednotes, resultId: note})
+        res.render('show', { notes: archivednotes, resultId: note})
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error')  
     }
     
+})
+
+app.patch('/archived/:id', async (req,res) => {
+    
+    const {id} = req.params
+    try {
+        const client = await pool.connect();
+
+        const resultId = await client.query('SELECT * FROM notes WHERE id = $1', [id]);
+        const isArchived = resultId.rows[0].isarchived
+
+        const updatedArchivedStatus = !isArchived;
+
+        
+        await client.query('UPDATE notes SET isarchived = $1 WHERE id = $2', [updatedArchivedStatus, id]);
+
+        
+
+       
+        client.release();
+        // console.log(result.rows)
+        res.redirect('/')
+        } catch (err) {
+    console.error(err);
+res.status(500).send('Internal Server Error')
+        }
+
 })
 
 app.get('/new',  async (req, res) => {
